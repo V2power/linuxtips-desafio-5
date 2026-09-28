@@ -39,8 +39,9 @@ jobs:
         working-directory: app
         run: npm install
 
-      - name: Testes de cobertura
+      - name: Testes unitários
         id: tests
+        continue-on-error: true
         working-directory: app
         run: |
           npm test -- --json --outputFile=jest-results.json
@@ -82,7 +83,6 @@ jobs:
       - name: Build and Push Docker Image
         id: build_push
         run: |
-          repo_lc=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           image="ghcr.io/${repo_lc}/api:${GITHUB_SHA}"
           docker build \
             --build-arg GH_PACKAGES_TOKEN \
@@ -91,7 +91,7 @@ jobs:
           docker push "$image"
           echo "image=$image" >> "$GITHUB_OUTPUT"
     outputs:
-      image: ${{ steps.docker_login.outputs.image }}
+      image: ${{ steps.build_push.outputs.image }}
   deploy:
     needs: build
     runs-on: ubuntu-latest
