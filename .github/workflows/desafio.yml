@@ -43,15 +43,28 @@ jobs:
         id: tests
         working-directory: app
         run: |
-          npm test >> "$GITHUB_OUTPUT"
+          npm test --json --outputFile=jest-results.json
+
+      - name: Calculate tests
+        id: result
+        run: |
+          PASSED=$(jq '.numPassedTests' jest-results.json)
+          TOTAL=$(jq '.numTotalTests' jest-results.json)
+
+          RATE=$(( PASSED * 100 / TOTAL ))
+
+          echo "Testes: $PASSED/$TOTAL"
+          echo "Taxa de sucesso: $RATE%"
+
+          echo "pass_rate=$RATE" >> "$GITHUB_OUTPUT"
     outputs:
-      coverage: ${{ steps.tests.outputs.coverage }}
+      sucesso: ${{ steps.result.outputs.pass_rate}}
   build:
     needs: test
     permissions:
       contents: read
       packages: write
-    if: ${{ needs.test.outputs.coverage >= 80 }}
+    if: ${{ needs.test.outputs.sucesso >= 80 }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
