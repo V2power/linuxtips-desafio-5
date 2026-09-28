@@ -83,9 +83,9 @@ jobs:
       - name: Build and Push Docker Image
         id: build_push
         run: |
+          repo_lc=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           image="ghcr.io/${repo_lc}/api:${GITHUB_SHA}"
           docker build \
-            --build-arg GH_PACKAGES_TOKEN \
             -t "$image" \
             app
           docker push "$image"
