@@ -43,7 +43,7 @@ jobs:
         id: tests
         working-directory: app
         run: |
-          npm test --json -- --outputFile=jest-results.json
+          npm test -- --json --outputFile=jest-results.json
 
       - name: Calculate tests
         working-directory: app
