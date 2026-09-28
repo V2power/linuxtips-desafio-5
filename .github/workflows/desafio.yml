@@ -46,6 +46,7 @@ jobs:
           npm test --json --outputFile=jest-results.json
 
       - name: Calculate tests
+        working-directory: app
         id: result
         run: |
           PASSED=$(jq '.numPassedTests' jest-results.json)
